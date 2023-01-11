@@ -12,7 +12,7 @@ import * as React from "react";
 
 export const meta: MetaFunction = () => {
   return {
-    title: "Sign Up",
+    title: "Registrarse",
   };
 };
 
@@ -38,7 +38,7 @@ export const action: ActionFunction = async ({ request }) => {
   // Ensure the email is valid
   if (!validateEmail(email)) {
     return json<ActionData>(
-      { errors: { email: "Email is invalid." } },
+      { errors: { email: "Correo Electrónico invalido." } },
       { status: 400 }
     );
   }
@@ -46,7 +46,7 @@ export const action: ActionFunction = async ({ request }) => {
   // What if a user sends us a password through other means than our form?
   if (typeof password !== "string") {
     return json(
-      { errors: { password: "Valid password is required." } },
+      { errors: { password: "Contraseña no valida." } },
       { status: 400 }
     );
   }
@@ -54,7 +54,7 @@ export const action: ActionFunction = async ({ request }) => {
   // Enforce minimum password length
   if (password.length < 6) {
     return json<ActionData>(
-      { errors: { password: "Password is too short." } },
+      { errors: { password: "Contraseña es muy corta." } },
       { status: 400 }
     );
   }
@@ -64,7 +64,7 @@ export const action: ActionFunction = async ({ request }) => {
   const existingUser = await getProfileByEmail(email);
   if (existingUser) {
     return json<ActionData>(
-      { errors: { email: "A user already exists with this email." } },
+      { errors: { email: "Existe un usuario registrado con el correo electrónico." } },
       { status: 400 }
     );
   }
@@ -100,10 +100,18 @@ export default function Join() {
   return (
     <div className="flex min-h-full flex-col justify-center">
       <div className="mx-auto w-full max-w-md px-8">
+        <div className="fixed inset-0">
+          <img
+            className="h-full w-full object-cover"
+            src="https://raw.githubusercontent.com/Gonzalox2/boxsanfelipe-sitio/2e5fabeecd10995ceee88591e649cfa2683167d1/app/images/Box_Background.jpg"                
+            alt="Box Sanfelipe, zona interior"
+          />
+          <div className="absolute inset-0 bg-[color:rgba(0,0,0,0.5)] mix-blend-multiply" />
+        </div>         
         <Form className="space-y-6" method="post" noValidate>
-          <div>
+          <div className="relative w-full h-full">
             <label className="text-sm font-medium" htmlFor="email">
-              <span className="block text-gray-700">Email Address</span>
+              <span className="block text-white">Correo Electrónico</span>
               {actionData?.errors?.email && (
                 <span className="block pt-1 text-red-700" id="email-error">
                   {actionData?.errors?.email}
@@ -111,7 +119,7 @@ export default function Join() {
               )}
             </label>
             <input
-              className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+              className="w-full rounded border border-red-500 px-2 py-1 text-lg"
               type="email"
               name="email"
               id="email"
@@ -121,11 +129,11 @@ export default function Join() {
               ref={emailRef}
             />
           </div>
-          <div>
+          <div className="relative w-full h-full">
             <label className="text-sm font-medium" htmlFor="password">
-              <span className="block text-gray-700">Password</span>
-              <span className="block font-light text-gray-700">
-                Must have at least 6 characters.
+              <span className="block text-white">Contraseña</span>
+              <span className="block font-light text-white">
+                Debe contener al menos 6 caracteres.
               </span>
               {actionData?.errors?.password && (
                 <span className="pt-1 text-red-700" id="password-error">
@@ -137,34 +145,41 @@ export default function Join() {
               id="password"
               type="password"
               name="password"
-              className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
-              autoComplete="new-password"
+              className="w-full rounded border border-red-500 px-2 py-1 text-lg"
+              autoComplete="Contraseña"
               aria-invalid={actionData?.errors?.password ? true : undefined}
               aria-describedby="password-error"
               ref={passwordRef}
             />
           </div>
           <button
-            className="w-full rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
-            type="submit"
-          >
-            Create Account
+            className="relative w-full rounded bg-red-500  py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400"
+            type="submit">
+            Registrar Usuario
           </button>
+          <div className="relative w-full">
+            <Link
+              to="/"
+              className="relative space-y-6 w-full rounded bg-gray-500  py-2 px-4 text-white hover:bg-gray-600 focus:bg-gray-400"
+            >
+              Volver
+            </Link>          
+          </div>
           <input type="hidden" name="redirectTo" value={redirectTo} />
-          <div className="flex items-center justify-center">
-            <div className="text-center text-sm text-gray-500">
-              Already have an account?{" "}
+          <div className="relative flex items-center justify-center">
+            <div className="text-center text-sm text-white">
+              ¿Ya posees una cuenta?{" "}
               <Link
-                className="text-blue-500 underline"
+                className="text-red-500 underline"
                 to={{
                   pathname: "/login",
                   search: searchParams.toString(),
                 }}
               >
-                Log in
+                Iniciar Sesión
               </Link>
             </div>
-          </div>
+          </div>        
         </Form>
       </div>
     </div>
