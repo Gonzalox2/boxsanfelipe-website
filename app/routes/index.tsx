@@ -8,7 +8,7 @@ export default function Index() {
       <div className="fixed inset-0">
         <img
           className="h-full w-full object-cover"
-          src="https://raw.githubusercontent.com/Gonzalox2/boxsanfelipe-sitio/2e5fabeecd10995ceee88591e649cfa2683167d1/app/images/Box_Background.jpg"                
+          src="https://raw.githubusercontent.com/Gonzalox2/boxsanfelipe-website/ceb2a996b6e78cbfb5a4cd87e6988a58f33aec4a/app/images/Box_Background.jpg"
           alt="Box Sanfelipe, zona interior"
         />
         <div className="absolute inset-0 bg-[color:rgba(0,0,0,0.5)] mix-blend-multiply" />
@@ -53,7 +53,7 @@ export default function Index() {
               </div>
               <div>
                 <img
-                  src="https://raw.githubusercontent.com/Gonzalox2/boxsanfelipe-sitio/main/app/images/Logo_01.png"
+                  src="https://raw.githubusercontent.com/Gonzalox2/boxsanfelipe-website/ceb2a996b6e78cbfb5a4cd87e6988a58f33aec4a/app/images/Logo_01.png"
                   alt="Logo Box"
                   className="mx-auto mt-16 w-full max-w-[12rem] md:max-w-[16rem]"
                 />
