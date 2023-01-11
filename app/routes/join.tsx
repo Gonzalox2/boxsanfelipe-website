@@ -108,8 +108,8 @@ export default function Join() {
           />
           <div className="absolute inset-0 bg-[color:rgba(0,0,0,0.5)] mix-blend-multiply" />
         </div>         
-        <Form className="space-y-6" method="post" noValidate>
-          <div className="relative w-full h-full">
+        <Form className="relative space-y-6" method="post" noValidate>
+          <div className="w-full h-full">
             <label className="text-sm font-medium" htmlFor="email">
               <span className="block text-white">Correo Electrónico</span>
               {actionData?.errors?.email && (
@@ -129,7 +129,7 @@ export default function Join() {
               ref={emailRef}
             />
           </div>
-          <div className="relative w-full h-full">
+          <div className="w-full h-full">
             <label className="text-sm font-medium" htmlFor="password">
               <span className="block text-white">Contraseña</span>
               <span className="block font-light text-white">
@@ -153,20 +153,20 @@ export default function Join() {
             />
           </div>
           <button
-            className="relative w-full rounded bg-red-500  py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400"
+            className="w-full rounded bg-red-500  py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400"
             type="submit">
             Registrar Usuario
           </button>
-          <div className="relative w-full">
+          <div className="w-full">
             <Link
               to="/"
-              className="relative space-y-6 w-full rounded bg-gray-500  py-2 px-4 text-white hover:bg-gray-600 focus:bg-gray-400"
+              className="space-y-6 w-full rounded bg-gray-500  py-2 px-4 text-white hover:bg-gray-600 focus:bg-gray-400"
             >
               Volver
             </Link>          
           </div>
           <input type="hidden" name="redirectTo" value={redirectTo} />
-          <div className="relative flex items-center justify-center">
+          <div className="flex items-center justify-center">
             <div className="text-center text-sm text-white">
               ¿Ya posees una cuenta?{" "}
               <Link

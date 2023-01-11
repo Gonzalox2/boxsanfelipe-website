@@ -92,10 +92,18 @@ export default function Login() {
   return (
     <div className="flex min-h-full flex-col justify-center">
       <div className="mx-auto w-full max-w-md px-8">
-        <Form method="post" className="space-y-6" noValidate>
+        <div className="fixed inset-0">
+          <img
+            className="h-full w-full object-cover"
+            src="https://raw.githubusercontent.com/Gonzalox2/boxsanfelipe-sitio/2e5fabeecd10995ceee88591e649cfa2683167d1/app/images/Box_Background.jpg"                
+            alt="Box Sanfelipe, zona interior"
+          />
+          <div className="absolute inset-0 bg-[color:rgba(0,0,0,0.5)] mix-blend-multiply" />
+        </div> 
+        <Form method="post" className="relative space-y-6" noValidate>
           <div>
             <label className="text-sm font-medium" htmlFor="email">
-              <span className="block text-gray-700">Email Address</span>
+              <span className="block text-white">Correo Electrónico</span>
               {actionData?.errors?.email && (
                 <span className="block pt-1 text-red-700" id="email-error">
                   {actionData?.errors?.email}
@@ -103,7 +111,7 @@ export default function Login() {
               )}
             </label>
             <input
-              className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+              className="w-full rounded border border-red-500 px-2 py-1 text-lg"
               autoComplete="email"
               type="email"
               name="email"
@@ -115,9 +123,9 @@ export default function Login() {
           </div>
           <div>
             <label className="text-sm font-medium" htmlFor="password">
-              <span className="block text-gray-700">Password</span>
-              <span className="block font-light text-gray-700">
-                Must have at least 6 characters.
+              <span className="block text-white">Contraseña</span>
+              <span className="block font-light text-white">
+                Debe contener al menos 6 caracteres.
               </span>
               {actionData?.errors?.password && (
                 <span className="pt-1 text-red-700" id="password-error">
@@ -130,38 +138,46 @@ export default function Login() {
               type="password"
               name="password"
               autoComplete=""
-              className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+              className="w-full rounded border border-red-500 px-2 py-1 text-lg"
               aria-invalid={actionData?.errors?.password ? true : undefined}
               aria-describedby="password-error"
               ref={passwordRef}
             />
           </div>
           <button
-            className="w-full rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
+            className="w-full rounded bg-red-500  py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400"
             type="submit"
           >
-            Log in
+            Iniciar Sesión
           </button>
           <input type="hidden" name="redirectTo" value={redirectTo} />
+          <div className="w-full">
+            <Link
+              to="/"
+              className="space-y-6 w-full rounded bg-gray-500  py-2 px-4 text-white hover:bg-gray-600 focus:bg-gray-400"
+            >
+              Volver
+            </Link>          
+          </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="h-4 w-4 rounded border-red-300 text-red-600 focus:ring-red-500"
                 id="remember"
                 name="remember"
                 type="checkbox"
               />
               <label
-                className="ml-2 block text-sm text-gray-900"
+                className="ml-2 block text-sm text-white"
                 htmlFor="remember"
               >
-                Remember me
+                Recuerdame
               </label>
             </div>
-            <div className="text-center text-sm text-gray-500">
-              Don't have an account?{" "}
+            <div className="text-center text-sm text-red-500">
+              ¿No tienes una cuenta?{" "}
               <Link
-                className="text-blue-500 underline"
+                className="text-red-500 underline"
                 to={{ pathname: "/join" }}
               >
                 Sign up
