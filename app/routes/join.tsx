@@ -18,6 +18,11 @@ export const meta: MetaFunction = () => {
 
 interface ActionData {
   errors: {
+    name?: string;
+    surname?: string;
+    second_surname?: string;
+    rut?: string;
+    phone?: string;
     email?: string;
     password?: string;
   };
@@ -31,9 +36,48 @@ export async function loader({ request }: LoaderArgs) {
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
+  const name = formData.get("name");
+  const surname = formData.get("surname");
+  const sec_surname = formData.get("second_surname");
+  const rut = formData.get("rut");
+  const phone = formData.get("phone");
   const email = formData.get("email");
   const password = formData.get("password");
   const redirectTo = formData.get("redirectTo");
+  if(!name){
+    return json<ActionData>(
+      { errors: { name: "Debes ingresar tu nombre." } },
+      { status: 400 }
+    );
+  }
+
+  if(!surname){
+    return json<ActionData>(
+      { errors: { surname: "Debes ingresar tu apellido paterno." } },
+      { status: 400 }
+    );
+  }
+
+  if(!sec_surname){
+    return json<ActionData>(
+      { errors: { second_surname: "Debes ingresar tu apellido materno." } },
+      { status: 400 }
+    );
+  }
+
+  if(!rut){
+    return json<ActionData>(
+      { errors: { rut: "Debes ingresar tu RUT." } },
+      { status: 400 }
+    );
+  }
+
+  if(!phone){
+    return json<ActionData>(
+      { errors: { phone: "Debes ingresar tu telefono." } },
+      { status: 400 }
+    );
+  }
 
   // Ensure the email is valid
   if (!validateEmail(email)) {
@@ -58,25 +102,27 @@ export const action: ActionFunction = async ({ request }) => {
       { status: 400 }
     );
   }
-
+  
   // A user could potentially already exist within our system
   // and we should communicate that well
-  const existingUser = await getProfileByEmail(email);
-  if (existingUser) {
+  //const existingUser = await getProfileByEmail(email);
+  //if (existingUser) {
+  //  return json<ActionData>(
+  //    { errors: { email: "Existe un usuario registrado con el correo electrónico." } },
+  //    { status: 400 }
+  //  );
+  //}
+  const user = await createUser(name.valueOf().toString(),surname.valueOf().toString(),sec_surname.valueOf().toString(),rut.valueOf().toString(),phone.valueOf().toString(),email);
+  if(user){
     return json<ActionData>(
-      { errors: { email: "Existe un usuario registrado con el correo electrónico." } },
+      { errors: { email: "Registrado" } },
       { status: 400 }
     );
   }
-
-  const user = await createUser(email, password);
-
-  return createUserSession({
-    request,
-    userId: user.id,
-    remember: false,
-    redirectTo: typeof redirectTo === "string" ? redirectTo : "/",
-  });
+  return json<ActionData>(
+    { errors: { email: "Usuario Vacio." } },
+    { status: 400 }
+  );
 };
 
 export default function Join() {
@@ -84,10 +130,35 @@ export default function Join() {
   const redirectTo = searchParams.get("redirectTo") ?? undefined;
 
   const actionData = useActionData() as ActionData;
+  const nameRef = React.useRef<HTMLInputElement>(null);
+  const surnameRef = React.useRef<HTMLInputElement>(null);
+  const secSurnameRef = React.useRef<HTMLInputElement>(null);
+  const rutRef = React.useRef<HTMLInputElement>(null);
+  const phoneRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
+  React.useEffect(() => {      
+    if (actionData?.errors?.name) {
+      nameRef?.current?.focus();
+    }
+
+    if (actionData?.errors?.surname) {
+      surnameRef?.current?.focus();
+    }
+
+    if (actionData?.errors?.second_surname) {
+      secSurnameRef?.current?.focus();
+    }
+
+    if (actionData?.errors?.rut) {
+      rutRef?.current?.focus();
+    }
+    
+    if (actionData?.errors?.phone) {
+      phoneRef?.current?.focus();
+    }
+
     if (actionData?.errors?.email) {
       emailRef?.current?.focus();
     }
@@ -107,8 +178,118 @@ export default function Join() {
             alt="Box Sanfelipe, zona interior"
           />
           <div className="absolute inset-0 bg-[color:rgba(0,0,0,0.5)] mix-blend-multiply" />
+          <div className="sweet-loading">
+    </div>
         </div>         
         <Form className="relative space-y-6" method="post" noValidate>
+          
+          <div className="w-full h-full">
+            <label className="text-sm font-medium" htmlFor="name">
+              <span className="block text-white">Nombres</span>
+              {actionData?.errors?.name && (
+                <span className="block pt-1 text-red-700" id="name-error">
+                  {actionData?.errors?.name}
+                </span>
+              )}
+            </label>
+            <input
+              className="w-full rounded border border-red-500 px-2 py-1 text-lg"
+              type="text"
+              name="name"
+              id="name"
+              required
+              aria-invalid={actionData?.errors?.name ? true : undefined}
+              aria-describedby="name-error"
+              ref={nameRef}
+            />
+          </div>
+
+          <div className="w-full h-full">
+            <label className="text-sm font-medium" htmlFor="surname">
+              <span className="block text-white">Apellido Paterno</span>
+              {actionData?.errors?.surname && (
+                <span className="block pt-1 text-red-700" id="surname-error">
+                  {actionData?.errors?.surname}
+                </span>
+              )}
+            </label>
+            <input
+              className="w-full rounded border border-red-500 px-2 py-1 text-lg"
+              type="text"
+              name="surname"
+              id="surname"
+              required
+              aria-invalid={actionData?.errors?.surname ? true : undefined}
+              aria-describedby="surname-error"
+              ref={surnameRef}
+            />
+          </div>
+
+          <div className="w-full h-full">
+            <label className="text-sm font-medium" htmlFor="second_surname">
+              <span className="block text-white">Apellido Materno</span>
+              {actionData?.errors?.second_surname && (
+                <span className="block pt-1 text-red-700" id="second_surname-error">
+                  {actionData?.errors?.second_surname}
+                </span>
+              )}
+            </label>
+            <input
+              className="w-full rounded border border-red-500 px-2 py-1 text-lg"
+              type="text"
+              name="second_surname"
+              id="second_surname"
+              required
+              aria-invalid={actionData?.errors?.second_surname ? true : undefined}
+              aria-describedby="second_surname-error"
+              ref={secSurnameRef}
+            />
+          </div>
+
+          <div className="w-full h-full">
+            <label className="text-sm font-medium" htmlFor="rut">
+              <span className="block text-white">RUT</span>
+              {actionData?.errors?.rut && (
+                <span className="block pt-1 text-red-700" id="rut-error">
+                  {actionData?.errors?.rut}
+                </span>
+              )}
+            </label>
+            <input
+              className="w-full rounded border border-red-500 px-2 py-1 text-lg"
+              type="text"
+              name="rut"
+              id="rut"
+              placeholder="Ej: 12.345.678-9"
+              required
+              aria-invalid={actionData?.errors?.rut ? true : undefined}
+              aria-describedby="rut-error"
+              ref={rutRef}
+            />
+          </div>
+          
+          <div className="w-full h-full">
+            <label className="text-sm font-medium" htmlFor="phone">
+              <span className="block text-white">Teléfono</span>
+              {actionData?.errors?.phone && (
+                <span className="block pt-1 text-red-700" id="phone-error">
+                  {actionData?.errors?.phone}
+                </span>
+              )}
+            </label>
+            <input
+              className="w-full rounded border border-red-500 px-2 py-1 text-lg"
+              type="text"
+              name="phone"
+              id="phone"    
+              placeholder="Ej: 912345678"        
+              required
+              aria-invalid={actionData?.errors?.phone ? true : undefined}
+              aria-describedby="phone-error"
+              ref={phoneRef}
+            />
+          </div>
+
           <div className="w-full h-full">
             <label className="text-sm font-medium" htmlFor="email">
               <span className="block text-white">Correo Electrónico</span>
@@ -129,6 +310,7 @@ export default function Join() {
               ref={emailRef}
             />
           </div>
+
           <div className="w-full h-full">
             <label className="text-sm font-medium" htmlFor="password">
               <span className="block text-white">Contraseña</span>
@@ -153,10 +335,11 @@ export default function Join() {
             />
           </div>
           <button
-            className="w-full rounded bg-red-500  py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400"
+            id="btnRegistrar"
+            className="w-full rounded bg-red-500  py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400"            
             type="submit">
             Registrar Usuario
-          </button>
+          </button>          
           <div className="w-full">
             <Link
               to="/"
@@ -185,3 +368,7 @@ export default function Join() {
     </div>
   );
 }
+function setLoading(arg0: boolean) {
+  throw new Error("Function not implemented.");
+}
+
