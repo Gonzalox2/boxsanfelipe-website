@@ -37,19 +37,19 @@ export const action: ActionFunction = async ({ request }) => {
   const remember = formData.get("remember");
 
   if (!validateEmail(email)) {
-    return json({ errors: { email: "Correo electrónico invalido." } }, { status: 400 });
+    return json({ errors: { email: "Email is invalid." } }, { status: 400 });
   }
 
   if (typeof password !== "string") {
     return json(
-      { errors: { password: "Contraseña invalida." } },
+      { errors: { password: "Valid password is required." } },
       { status: 400 }
     );
   }
 
   if (password.length < 6) {
     return json(
-      { errors: { password: "Contraseña es muy corta" } },
+      { errors: { password: "Password is too short" } },
       { status: 400 }
     );
   }
@@ -58,7 +58,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   if (!user) {
     return json(
-      { errors: { email: "Correo / Clave invalidos" } },
+      { errors: { email: "Invalid email or password" } },
       { status: 400 }
     );
   }
@@ -150,7 +150,15 @@ export default function Login() {
           >
             Iniciar Sesión
           </button>
-          <input type="hidden" name="redirectTo" value={redirectTo} />          
+          <input type="hidden" name="redirectTo" value={redirectTo} />
+          <div className="w-full">
+            <Link
+              to="/"
+              className="space-y-6 w-full rounded bg-gray-500  py-2 px-4 text-white hover:bg-gray-600 focus:bg-gray-400"
+            >
+              Volver
+            </Link>          
+          </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
@@ -172,17 +180,9 @@ export default function Login() {
                 className="text-red-500 underline"
                 to={{ pathname: "/join" }}
               >
-                Registrarse
+                Sign up
               </Link>
             </div>
-          </div>
-          <div className="flex w-full">
-            <Link
-              to="/"
-              className="flex justify-center space-y-6 w-full rounded bg-gray-500 py-2 px-4 text-white text-center hover:bg-gray-600 focus:bg-gray-400"
-            >
-              Volver
-            </Link>          
           </div>
         </Form>
       </div>

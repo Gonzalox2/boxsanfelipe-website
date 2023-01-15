@@ -4,7 +4,7 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
+import { Form, Link, useActionData, useSearchParams, useTransition } from "@remix-run/react";
 import { createUserSession, getUserId } from "~/session.server";
 import { createUser, getProfileByEmail } from "~/models/user.server";
 import { validateEmail } from "~/utils";
@@ -25,6 +25,10 @@ interface ActionData {
     phone?: string;
     email?: string;
     password?: string;
+    user?: string;
+  },
+  success:{
+    user?: boolean;
   };
 }
 
@@ -46,35 +50,35 @@ export const action: ActionFunction = async ({ request }) => {
   const redirectTo = formData.get("redirectTo");
   if(!name){
     return json<ActionData>(
-      { errors: { name: "Debes ingresar tu nombre." } },
+      { errors: { name: "Debes ingresar tu nombre." },success:{user: false }},
       { status: 400 }
     );
   }
 
   if(!surname){
     return json<ActionData>(
-      { errors: { surname: "Debes ingresar tu apellido paterno." } },
+      { errors: { surname: "Debes ingresar tu apellido paterno." },success:{user:false }},
       { status: 400 }
     );
   }
 
   if(!sec_surname){
     return json<ActionData>(
-      { errors: { second_surname: "Debes ingresar tu apellido materno." } },
+      { errors: { second_surname: "Debes ingresar tu apellido materno." },success:{user:false }},
       { status: 400 }
     );
   }
 
   if(!rut){
     return json<ActionData>(
-      { errors: { rut: "Debes ingresar tu RUT." } },
+      { errors: { rut: "Debes ingresar tu RUT." },success:{user:false }},
       { status: 400 }
     );
   }
 
   if(!phone){
     return json<ActionData>(
-      { errors: { phone: "Debes ingresar tu telefono." } },
+      { errors: { phone: "Debes ingresar tu telefono." },success:{user:false }},
       { status: 400 }
     );
   }
@@ -82,7 +86,7 @@ export const action: ActionFunction = async ({ request }) => {
   // Ensure the email is valid
   if (!validateEmail(email)) {
     return json<ActionData>(
-      { errors: { email: "Correo Electrónico invalido." } },
+      { errors: { email: "Correo Electrónico invalido." },success:{user:false }},
       { status: 400 }
     );
   }
@@ -90,7 +94,7 @@ export const action: ActionFunction = async ({ request }) => {
   // What if a user sends us a password through other means than our form?
   if (typeof password !== "string") {
     return json(
-      { errors: { password: "Contraseña no valida." } },
+      { errors: { password: "Contraseña no valida." },success:{user:false }},
       { status: 400 }
     );
   }
@@ -98,7 +102,7 @@ export const action: ActionFunction = async ({ request }) => {
   // Enforce minimum password length
   if (password.length < 6) {
     return json<ActionData>(
-      { errors: { password: "Contraseña es muy corta." } },
+      { errors: { password: "Contraseña es muy corta." },success:{user:false }},
       { status: 400 }
     );
   }
@@ -115,12 +119,12 @@ export const action: ActionFunction = async ({ request }) => {
   const user = await createUser(name.valueOf().toString(),surname.valueOf().toString(),sec_surname.valueOf().toString(),rut.valueOf().toString(),phone.valueOf().toString(),email);
   if(user){
     return json<ActionData>(
-      { errors: { email: "Registrado" } },
+      { errors: { user: "Registrado con exito" } ,success:{user:true }},
       { status: 400 }
     );
   }
   return json<ActionData>(
-    { errors: { email: "Usuario Vacio." } },
+    { errors: { user: "Problemas al ingresar registro" },success:{user:false }},
     { status: 400 }
   );
 };
@@ -128,7 +132,8 @@ export const action: ActionFunction = async ({ request }) => {
 export default function Join() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") ?? undefined;
-
+  const {state} = useTransition();
+  const busy = state === "submitting";  
   const actionData = useActionData() as ActionData;
   const nameRef = React.useRef<HTMLInputElement>(null);
   const surnameRef = React.useRef<HTMLInputElement>(null);
@@ -336,20 +341,30 @@ export default function Join() {
           </div>
           <button
             id="btnRegistrar"
-            className="w-full rounded bg-red-500  py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400"            
-            type="submit">
-            Registrar Usuario
+            className="w-full rounded bg-red-500  py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400 disabled:bg-red-300"            
+            type="submit"
+            disabled={busy}>
+            {busy? (<p>Registrando Usuario...</p>) : <p>Registrar Usuario</p>}
           </button>          
-          <div className="w-full">
-            <Link
-              to="/"
-              className="space-y-6 w-full rounded bg-gray-500  py-2 px-4 text-white hover:bg-gray-600 focus:bg-gray-400"
-            >
-              Volver
-            </Link>          
-          </div>
+          <div className="w-full h-full items-center justify-center">
+            <label className="text-sm font-medium" htmlFor="name">
+              {!actionData && (
+                <span className="block text-white text-center text-md" id="user-error">&nbsp;</span>
+              )}     
+              {!actionData?.success?.user && (
+                <span className="block text-red-700 text-center text-md font-weight-bold" id="user-error">
+                  <b>{actionData?.errors?.user}</b>
+                </span>
+              )}
+              {actionData?.success?.user && (
+                <span className="block text-white text-center text-md font-weight-bold" id="user-error">
+                  <b>{actionData?.errors?.user}</b>
+                </span>
+              )}
+            </label>
+          </div>            
           <input type="hidden" name="redirectTo" value={redirectTo} />
-          <div className="flex items-center justify-center">
+          {/*<div className="flex items-center justify-center">
             <div className="text-center text-sm text-white">
               ¿Ya posees una cuenta?{" "}
               <Link
@@ -361,14 +376,19 @@ export default function Join() {
               >
                 Iniciar Sesión
               </Link>
-            </div>
-          </div>        
+            </div>            
+          </div>*/}
+          <div className="flex w-full h-full items-center justify-center">                      
+            <Link
+              to="/"
+              className="flex justify-center space-y-6 w-full rounded bg-gray-500 py-2 px-4 text-white text-center hover:bg-gray-600 focus:bg-gray-400"
+            >
+              Volver
+            </Link>          
+          </div>               
         </Form>
       </div>
     </div>
   );
-}
-function setLoading(arg0: boolean) {
-  throw new Error("Function not implemented.");
 }
 
